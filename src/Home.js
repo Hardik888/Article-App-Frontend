@@ -1,8 +1,9 @@
 // Home.js
 import React, { useState } from 'react';
-import { Dimensions, StyleSheet, ScrollView, Image, TouchableOpacity } from 'react-native';
-import { Block, theme, Input, Text, Icon } from 'galio-framework';
+import { Dimensions, StyleSheet, ScrollView, Image, TouchableOpacity, View } from 'react-native';
+import { Block, theme, Input, Text } from 'galio-framework';
 import articles from '../constants/articles';
+import { Feather as Icon } from '@expo/vector-icons';
 
 const { width, height } = Dimensions.get('screen');
 
@@ -16,7 +17,6 @@ const Home = () => {
   const closeDrawer = () => {
     setDrawerOpen(false);
   };
-
   const renderDrawer = () => (
     <Block style={styles.drawer}>
       {/* User profile section */}
@@ -24,39 +24,40 @@ const Home = () => {
         <Icon name="user" family="Feather" size={40} color={theme.COLORS.MUTED} style={styles.userIcon} />
         <Text style={styles.userName}>John Doe</Text>
       </Block>
-
+  
       {/* Add your custom drawer items here */}
       <DrawerItem title="Home" onPress={closeDrawer} />
       <DrawerItem title="About" onPress={closeDrawer} />
       <DrawerItem title="Contact Us" onPress={closeDrawer} />
       <DrawerItem title="Services" onPress={closeDrawer} />
       <DrawerItem title="Blog" onPress={closeDrawer} />
+  
+      {/* Logout option */}
+      <DrawerItem title="Logout" icon="log-out" onPress={() => alert('Logout')} />
     </Block>
   );
-
   const renderArticles = () => (
-    <ScrollView
-      contentContainerStyle={styles.articles}
-      onPress={isDrawerOpen ? closeDrawer : undefined}
-    >
+    <ScrollView contentContainerStyle={styles.articles}>
       {articles.map((article, index) => (
-        <Block key={index} style={styles.articleCard}>
-          {article.horizontal ? (
-            <Block row>
-              <Image source={{ uri: article.image }} style={styles.thumbnailHorizontal} />
-              <Block flex style={styles.content}>
+        <TouchableOpacity key={index} onPress={isDrawerOpen ? closeDrawer : undefined}>
+          <Block key={index} style={styles.articleCard}>
+            {article.horizontal ? (
+              <Block row>
+                <Image source={{ uri: article.image }} style={styles.thumbnailHorizontal} />
+                <Block flex style={styles.content}>
+                  <Text style={styles.title}>{article.title}</Text>
+                  <Text>{article.cta}</Text>
+                </Block>
+              </Block>
+            ) : (
+              <Block>
+                <Image source={{ uri: article.image }} style={styles.thumbnailVertical} />
                 <Text style={styles.title}>{article.title}</Text>
                 <Text>{article.cta}</Text>
               </Block>
-            </Block>
-          ) : (
-            <Block>
-              <Image source={{ uri: article.image }} style={styles.thumbnailVertical} />
-              <Text style={styles.title}>{article.title}</Text>
-              <Text>{article.cta}</Text>
-            </Block>
-          )}
-        </Block>
+            )}
+          </Block>
+        </TouchableOpacity>
       ))}
     </ScrollView>
   );
@@ -65,7 +66,7 @@ const Home = () => {
     <Block flex style={styles.home}>
       <Block flex={0.1} style={styles.searchBarContainer}>
         <TouchableOpacity onPress={toggleDrawer}>
-          <Icon name="menu" family="Feather" size={25} color={theme.COLORS.MUTED} />
+          <Icon style={{ top: 25 }} name="menu" family="Feather" size={25} color={theme.COLORS.MUTED} />
         </TouchableOpacity>
         <Input
           placeholder="Search"
@@ -77,28 +78,50 @@ const Home = () => {
           style={styles.searchInput}
         />
       </Block>
-      <TouchableOpacity
-        activeOpacity={1}
-        onPress={closeDrawer}
-        style={{ flex: 1, paddingTop: 20 }}
-      >
-        <Block flex>
-          {renderArticles()}
-        </Block>
-      </TouchableOpacity>
-      {isDrawerOpen && renderDrawer()}
+      <View style={{ flex: 1, flexDirection: 'row' }}>
+        <TouchableOpacity
+          activeOpacity={1}
+          onPress={closeDrawer}
+          style={{ flex: 1 }}
+        >
+          <Block flex>
+            {renderArticles()}
+          </Block>
+        </TouchableOpacity>
+        {isDrawerOpen && renderDrawer()}
+      </View>
+
+      {/* Bottom Navigation Bar */}
+      <Block style={styles.bottomNavBar}>
+        <TouchableOpacity style={styles.bottomNavItem}>
+          <Icon name="home" family="Feather" size={20} color={theme.COLORS.MUTED} />
+          <Text style={styles.bottomNavText}>Home</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.bottomNavItem}>
+          <Icon name="inbox" family="Feather" size={20} color={theme.COLORS.MUTED} />
+          <Text style={styles.bottomNavText}>Inbox</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.bottomNavItem}>
+          <Icon name="user" family="Feather" size={20} color={theme.COLORS.MUTED} />
+          <Text style={styles.bottomNavText}>Profile</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.bottomNavItem}>
+          <Icon name="hash" family="Feather" size={20} color={theme.COLORS.MUTED} />
+          <Text style={styles.bottomNavText}>Hashtags</Text>
+        </TouchableOpacity>
+      </Block>
     </Block>
   );
 };
-
-const DrawerItem = ({ title, onPress }) => (
-  <TouchableOpacity style={styles.drawerItem} onPress={onPress}>
-    <Block style={styles.drawerItemContent}>
-      <Text style={styles.drawerItemText}>{title}</Text>
-    </Block>
-  </TouchableOpacity>
-);
-
+const DrawerItem = ({ title, onPress, icon }) => (
+    <TouchableOpacity style={styles.drawerItem} onPress={onPress}>
+      <Block style={styles.drawerItemContent}>
+        {icon && <Icon name={icon} family="Feather" size={20} color={theme.COLORS.MUTED} style={styles.drawerItemIcon} />}
+        <Text style={styles.drawerItemText}>{title}</Text>
+      </Block>
+    </TouchableOpacity>
+  );
+  
 const styles = StyleSheet.create({
   home: {
     flex: 1,
@@ -125,6 +148,7 @@ const styles = StyleSheet.create({
     borderColor: theme.COLORS.MUTED,
     height: theme.SIZES.BASE * 2,
     width: width - 100,
+    top: 25,
   },
   articleCard: {
     backgroundColor: 'white',
@@ -148,6 +172,12 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     borderRadius: theme.SIZES.BASE,
   },
+  drawerItemIcon: {
+    marginRight: 0,
+    left:60,
+    top:19,
+  },
+  
   content: {
     flex: 1,
   },
@@ -172,17 +202,20 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: 10,
     paddingHorizontal: 15,
+
   },
   drawerItemContent: {
     padding: 10,
     borderBottomWidth: StyleSheet.hairlineWidth,
     borderBottomColor: 'gray',
     width: '100%',
+
   },
   drawerItemText: {
     fontSize: 16,
+    color: 'rgba(20,50,20,0.5)',
     fontWeight: 'bold',
-    color: theme.COLORS.MUTED,
+
     textShadowColor: 'rgba(0, 0, 0, 0.1)',
     textShadowOffset: { width: 1, height: 1 },
     textShadowRadius: 1,
@@ -195,15 +228,34 @@ const styles = StyleSheet.create({
     borderBottomColor: 'gray',
   },
   userIcon: {
-    marginRight: 15,
+    marginRight: 14,
     borderColor: theme.COLORS.MUTED,
-    borderWidth: 1,
-    borderRadius: 50,
-    padding: 10,
+    borderWidth: 0.5,
+    borderColor: 'rgba(20,50,20,0.5)',
+    borderRadius: 15,
+    padding: 1,
+    bottom: 1,
   },
   userName: {
-    fontSize: 18,
+    fontSize: 17,
+    color: 'rgba(20,5,2,1)',
     fontWeight: 'bold',
+  },
+  bottomNavBar: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    alignItems: 'center',
+    backgroundColor: 'white',
+    borderTopWidth: StyleSheet.hairlineWidth,
+    borderTopColor: 'gray',
+    paddingVertical: 10,
+  },
+  bottomNavItem: {
+    alignItems: 'center',
+  },
+  bottomNavText: {
+    marginTop: 5,
+    color: theme.COLORS.MUTED,
   },
 });
 
