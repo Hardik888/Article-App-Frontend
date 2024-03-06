@@ -6,6 +6,7 @@ import Profile from './src/testprofile';
 import Register from './src/register';
 import NewUserLogin from './src/verification';
 import Home from './src/Home';
+import InboxScreen from './src/inbox';
 export default function App() {
   return (
   <Home/>

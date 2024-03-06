@@ -5,12 +5,19 @@ import articles from '../constants/articles';
 import { Feather as Icon } from '@expo/vector-icons';
 import { useFonts, SourceSerifPro_400Regular } from '@expo-google-fonts/source-serif-pro';
 import AppLoading from 'expo-app-loading'; // Import AppLoading
-
+import InboxScreen from './inbox';
 const { width, height } = Dimensions.get('screen');
 
 const Home = () => {
   const [isDrawerOpen, setDrawerOpen] = useState(false);
   const [selectedarticle, setselectedarticle] = useState(null);
+  const [changeinbox,setchangeinbox] = useState(false);
+
+
+  const switchinbox  = () => {
+    setchangeinbox(true);
+  }
+
 
   const toggleDrawer = () => {
     setDrawerOpen(!isDrawerOpen);
@@ -19,10 +26,18 @@ const Home = () => {
     SourceSerifPro_400Regular,
   });
   
-  if (!fontsLoaded) {
-    return <AppLoading />;
-  }
-
+  // if (!fontsLoaded) {
+  //   // Use SplashScreen.preventAutoHideAsync() to prevent automatic hiding
+  //   SplashScreen.preventAutoHideAsync();
+  //   return (
+  //     // Use SplashScreen.hideAsync() to hide the splash screen when fonts are loaded
+  //     <AppLoad  
+  //       startAsync={() => SplashScreen.hideAsync()}
+  //       onFinish={() => {}}
+  //       onError={() => {}}
+  //     />
+  //   );
+  // }
   const closeDrawer = () => {
     setDrawerOpen(false);
   };
@@ -97,7 +112,8 @@ const Home = () => {
       )}
     </ScrollView>
   );
-
+  if (!changeinbox) 
+  {
   return (
     <Block flex style={styles.home}>
       <Block flex={0.1} style={styles.searchBarContainer}>
@@ -129,7 +145,7 @@ const Home = () => {
           <Icon name="home" family="Feather" size={20} color={theme.COLORS.MUTED} />
           <Text style={styles.bottomNavText}>Home</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.bottomNavItem}>
+        <TouchableOpacity style={styles.bottomNavItem} onPress={switchinbox}>
           <Icon name="inbox" family="Feather" size={20} color={theme.COLORS.MUTED} />
           <Text style={styles.bottomNavText}>Inbox</Text>
         </TouchableOpacity>
@@ -144,7 +160,15 @@ const Home = () => {
       </Block>
     </Block>
   );
-};
+}
+else {
+  return (
+    <InboxScreen openArticle={openArticle}/>
+  );
+}
+}
+
+
 
 const DrawerItem = ({ title, onPress, icon }) => (
   <TouchableOpacity style={styles.drawerItem} onPress={onPress}>
