@@ -7,6 +7,7 @@ export default [
     cta: 'View article',
     provider: 'Sweet Treats Daily',
     date: '2024-02-28', // Example date, you can replace it with the actual publish date
+    hashtags: ['IceCream', 'Desserts', 'Carrageenan'],
   },
   {
     title: 'Is makeup one of your daily esse …',
@@ -15,6 +16,7 @@ export default [
     cta: 'View article',
     provider: 'Beauty Insights',
     date: '2024-02-27', // Example date, you can replace it with the actual publish date
+    hashtags: ['Makeup', 'Beauty', 'SelfExpression'],
   },
   {
     title: 'Coffee is more than just a drink: It’s …',
@@ -23,6 +25,7 @@ export default [
     cta: 'View article',
     provider: 'Caffeine Chronicles',
     date: '2024-02-26', // Example date, you can replace it with the actual publish date
+    hashtags: ['Coffee', 'CulturalImpact', 'SocialInteractions'],
   },
   {
     title: 'Fashion is a popular style, especially in …',
@@ -31,6 +34,7 @@ export default [
     cta: 'View article',
     provider: 'Style Gazette',
     date: '2024-02-25', // Example date, you can replace it with the actual publish date
+    hashtags: ['Fashion', 'Style', 'Trends'],
   },
   {
     title: 'Argon is a great free UI packag …',
@@ -40,5 +44,6 @@ export default [
     provider: 'Dev Insights',
     horizontal: true,
     date: '2024-02-24', // Example date, you can replace it with the actual publish date
+    hashtags: ['Argon', 'UIPackage', 'Developers'],
   },
 ];

@@ -10,13 +10,17 @@ import { Block, Text, theme } from "galio-framework";
 
 import { Button, Icon, Input } from "../components";
 import { Images, argonTheme } from "../constants";
-
+import Home from "./Home";
 const { width, height } = Dimensions.get("screen");
 
 const NewUserLogin = () => {
   const [mobileNumber, setMobileNumber] = useState("");
   const [otp, setOtp] = useState("");
+  const [changetohome,setchangetohome] = useState(false);
 
+  const onscreenchange = () => {
+    setchangetohome(true);
+  }
   const handleGenerateOTP = () => {
     // Implement OTP generation logic here
     console.log("Mobile Number:", mobileNumber);
@@ -29,7 +33,8 @@ const NewUserLogin = () => {
     console.log("OTP:", otp);
     // Verify OTP and log the user in
   };
-
+if (changetohome)
+ {
   return (
     <Block flex middle>
       <StatusBar hidden />
@@ -88,21 +93,21 @@ const NewUserLogin = () => {
                   <Button
                     color="white"
                     style={styles.generateOTPButton}
-                    onPress={handleGenerateOTP}
+                    onPress={onscreenchange}
                   >
                     <Text bold size={15} color={'black'}>
                       Generate OTP
                     </Text>
                   </Button>
-                  <Button
+                  {/* <Button
                     color="primary"
                     style={styles.loginButton}
-                    onPress={handleLogin}
+                    onPress={onscreenchange}
                   >
                     <Text bold size={15} color={argonTheme.COLORS.WHITE}>
                       LOGIN
                     </Text>
-                  </Button>
+                  </Button> */}
                 </Block>
               </KeyboardAvoidingView>
             </Block>
@@ -111,8 +116,13 @@ const NewUserLogin = () => {
       </ImageBackground>
     </Block>
   );
-};
-
+}
+else {
+  return (
+    <Home/>
+  )
+}
+}
 const styles = StyleSheet.create({
   loginContainer: {
     width: width * 0.9,

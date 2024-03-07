@@ -4,20 +4,26 @@ import { Block, theme, Input, Text } from 'galio-framework';
 import articles from '../constants/articles';
 import { Feather as Icon } from '@expo/vector-icons';
 import { useFonts, SourceSerifPro_400Regular } from '@expo-google-fonts/source-serif-pro';
-import AppLoading from 'expo-app-loading'; // Import AppLoading
+import AppLoading from 'expo-app-loading';
 import InboxScreen from './inbox';
+import Profile from './testprofile';
+
 const { width, height } = Dimensions.get('screen');
 
 const Home = () => {
   const [isDrawerOpen, setDrawerOpen] = useState(false);
   const [selectedarticle, setselectedarticle] = useState(null);
-  const [changeinbox,setchangeinbox] = useState(false);
-
-
-  const switchinbox  = () => {
+  const [changeinbox, setchangeinbox] = useState(false);
+  const [changeprofile, setprofile] = useState(false);
+  const profilescreen = () => {
+    setprofile(true);
+    setchangeinbox(false);
+  };
+  
+  const switchinbox = () => {
     setchangeinbox(true);
-  }
-
+    setprofile(false);
+  };
 
   const toggleDrawer = () => {
     setDrawerOpen(!isDrawerOpen);
@@ -25,19 +31,7 @@ const Home = () => {
   const [fontsLoaded] = useFonts({
     SourceSerifPro_400Regular,
   });
-  
-  // if (!fontsLoaded) {
-  //   // Use SplashScreen.preventAutoHideAsync() to prevent automatic hiding
-  //   SplashScreen.preventAutoHideAsync();
-  //   return (
-  //     // Use SplashScreen.hideAsync() to hide the splash screen when fonts are loaded
-  //     <AppLoad  
-  //       startAsync={() => SplashScreen.hideAsync()}
-  //       onFinish={() => {}}
-  //       onError={() => {}}
-  //     />
-  //   );
-  // }
+
   const closeDrawer = () => {
     setDrawerOpen(false);
   };
@@ -49,7 +43,7 @@ const Home = () => {
   const goback = () => {
     setselectedarticle(null);
   };
-
+  console.log('Render Articles - changeinbox:', changeinbox, 'changeprofile:', changeprofile);
   const renderDrawer = () => (
     <Block style={styles.drawer}>
       {/* User profile section */}
@@ -71,6 +65,7 @@ const Home = () => {
   );
 
   const renderArticles = () => (
+    
     <ScrollView contentContainerStyle={styles.articles}>
       {selectedarticle ? (
         <TouchableOpacity onPress={goback}>
@@ -79,11 +74,9 @@ const Home = () => {
             <Image source={{ uri: selectedarticle.image }} style={styles.thumbnailVertical} />
             <Text style={styles.title}>{selectedarticle.title}</Text>
             <Text style={styles.description}>{selectedarticle.description}</Text>
-  
+
             {/* Additional styling for single article */}
-            <Text style={styles.singleArticleContent}>
-              {selectedarticle.content}
-            </Text>
+            <Text style={styles.singleArticleContent}>{selectedarticle.content}</Text>
           </Block>
         </TouchableOpacity>
       ) : (
@@ -108,66 +101,58 @@ const Home = () => {
               )}
             </Block>
           </TouchableOpacity>
-        )) 
+        ))
       )}
     </ScrollView>
   );
-  if (!changeinbox) 
-  {
-  return (
-    <Block flex style={styles.home}>
-      <Block flex={0.1} style={styles.searchBarContainer}>
-        <TouchableOpacity onPress={toggleDrawer}>
-          <Icon style={{ top: 25 }} name="menu" family="Feather" size={25} color={theme.COLORS.MUTED} />
-        </TouchableOpacity>
-        {/* <Input
-          placeholder="Search"
-          right
-          icon="search"
-          family="EvilIcons"
-          iconSize={16}
-          iconColor={theme.COLORS.MUTED}
-          style={styles.searchInput}
-        /> */}
-      </Block>
-      <View style={{ flex: 1, flexDirection: 'row' }}>
-        <TouchableOpacity activeOpacity={1} onPress={closeDrawer} style={{ flex: 1 }}>
-          <Block flex>
-            {renderArticles()}
-          </Block>
-        </TouchableOpacity>
-        {isDrawerOpen && renderDrawer()}
-      </View>
+  if (!changeinbox) {
+    return (
+      <Block flex style={styles.home}>
+        <Block flex={0.1} style={styles.searchBarContainer}>
+          <TouchableOpacity onPress={toggleDrawer}>
+            <Icon style={{ top: 25 }} name="menu" family="Feather" size={25} color={theme.COLORS.MUTED} />
+          </TouchableOpacity>
+        </Block>
+        <View style={{ flex: 1, flexDirection: 'row' }}>
+          <TouchableOpacity activeOpacity={1} onPress={closeDrawer} style={{ flex: 1 }}>
+            <Block flex>
+              {renderArticles()}
+            </Block>
+          </TouchableOpacity>
+          {isDrawerOpen && renderDrawer()}
+        </View>
 
-      {/* Bottom Navigation Bar */}
-      <Block style={styles.bottomNavBar}>
-        <TouchableOpacity style={styles.bottomNavItem} onPress={() => openArticle(null)}>
-          <Icon name="home" family="Feather" size={20} color={theme.COLORS.MUTED} />
-          <Text style={styles.bottomNavText}>Home</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.bottomNavItem} onPress={switchinbox}>
-          <Icon name="inbox" family="Feather" size={20} color={theme.COLORS.MUTED} />
-          <Text style={styles.bottomNavText}>Inbox</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.bottomNavItem}>
-          <Icon name="user" family="Feather" size={20} color={theme.COLORS.MUTED} />
-          <Text style={styles.bottomNavText}>Profile</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.bottomNavItem}>
-          <Icon name="hash" family="Feather" size={20} color={theme.COLORS.MUTED} />
-          <Text style={styles.bottomNavText}>Hashtags</Text>
-        </TouchableOpacity>
+        {/* Bottom Navigation Bar */}
+        <Block style={styles.bottomNavBar}>
+          <TouchableOpacity style={styles.bottomNavItem} onPress={() => openArticle(null)}>
+            <Icon name="home" family="Feather" size={20} color={theme.COLORS.MUTED} />
+            <Text style={styles.bottomNavText}>Home</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.bottomNavItem} onPress={switchinbox}>
+            <Icon name="inbox" family="Feather" size={20} color={theme.COLORS.MUTED} />
+            <Text style={styles.bottomNavText}>Inbox</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.bottomNavItem} onPress={profilescreen}>
+            <Icon name="user" family="Feather" size={20} color={theme.COLORS.MUTED} />
+            <Text style={styles.bottomNavText}>Profile</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.bottomNavItem}>
+            <Icon name="hash" family="Feather" size={20} color={theme.COLORS.MUTED} />
+            <Text style={styles.bottomNavText}>Hashtags</Text>
+          </TouchableOpacity>
+        </Block>
       </Block>
-    </Block>
-  );
-}
-else {
-  return (
-    <InboxScreen openArticle={openArticle}/>
-  );
-}
-}
+    );
+  } else if (changeprofile) {
+    return (
+<Profile/>)
 
+  } else {
+    return (
+      <InboxScreen openArticle={openArticle} />
+    );
+  }
+};
 
 
 const DrawerItem = ({ title, onPress, icon }) => (
