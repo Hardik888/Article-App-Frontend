@@ -17,7 +17,7 @@ const AppNavigator = () => {
       <Stack.Navigator initialRouteName="SplashScreen" screenOptions={{ headerShown: false }}>
       <Stack.Screen name = "SplashScreen" component ={SplashScreen}/>
       <Stack.Screen name="Register" component={Register} />
-      <Stack.Screen name = "Home" component={Home} />
+      <Stack.Screen name = "Home" component={Home}options={{ title: 'My home' }} />
       <Stack.Screen name = "inbox" component = {InboxScreen}/>
       <Stack.Screen name = "HashtagsScreen" component={HashtagScreen}/>
       <Stack.Screen name = "Profile" component={Profile}/>

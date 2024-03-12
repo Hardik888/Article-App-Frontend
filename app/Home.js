@@ -1,21 +1,20 @@
 import React, { useState } from 'react';
 import { Dimensions, StyleSheet, ScrollView, Image, TouchableOpacity, View } from 'react-native';
 import { Block, theme, Input, Text } from 'galio-framework';
+import Carousel, { Pagination } from 'react-native-snap-carousel';
 import articles from '../constants/articles';
 import { Feather as Icon } from '@expo/vector-icons';
 import { useFonts, SourceSerifPro_400Regular } from '@expo-google-fonts/source-serif-pro';
-import AppLoading from 'expo-app-loading';
-import InboxScreen from './inbox';
-import Profile from './testprofile';
-import {useNavigation} from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
 const { width, height } = Dimensions.get('screen');
-
 const Home = () => {
   const [isDrawerOpen, setDrawerOpen] = useState(false);
   const [selectedarticle, setselectedarticle] = useState(null);
   const [changeinbox, setchangeinbox] = useState(false);
   const [changeprofile, setprofile] = useState(false);
+  const [activeSlide, setActiveSlide] = useState(0);
   const navigation = useNavigation();
+
   const profilescreen = () => {
     navigation.navigate('Profile');
   };
@@ -24,7 +23,6 @@ const Home = () => {
     navigation.navigate('HashtagsScreen');
   };
 
-
   const switchinbox = () => {
     navigation.navigate('inbox');
   };
@@ -32,6 +30,7 @@ const Home = () => {
   const toggleDrawer = () => {
     setDrawerOpen(!isDrawerOpen);
   };
+
   const [fontsLoaded] = useFonts({
     SourceSerifPro_400Regular,
   });
@@ -43,16 +42,21 @@ const Home = () => {
   const openArticle = (article) => {
     setselectedarticle(article);
   };
-  const logout  = () =>{
+
+  const logout = () => {
     navigation.navigate('SplashScreen');
-  }
+  };
+
   const goback = () => {
     setselectedarticle(null);
   };
-  const contact = () => {
+
+  const contactus = () => {
     navigation.navigate('Contact');
-  }
+  };
+
   console.log('Render Articles - changeinbox:', changeinbox, 'changeprofile:', changeprofile);
+
   const renderDrawer = () => (
     <Block style={styles.drawer}>
       {/* User profile section */}
@@ -64,7 +68,7 @@ const Home = () => {
       {/* Add your custom drawer items here */}
       <DrawerItem title="Home" onPress={() => openArticle(null)} />
       <DrawerItem title="About" onPress={closeDrawer} />
-      <DrawerItem title="Contact Us" onPress={contact} />
+      <DrawerItem title="Contact Us" onPress={contactus} />
       <DrawerItem title="Services" onPress={closeDrawer} />
       <DrawerItem title="Blog" onPress={closeDrawer} />
 
@@ -73,23 +77,69 @@ const Home = () => {
     </Block>
   );
 
-  const renderArticles = () => (
-    
+  const renderCarouselItem = ({ item }) => (
+    <TouchableOpacity onPress={() => openArticle(item)}>
+      <Block key={item.id} style={styles.articleCard}>
+        {item.horizontal ? (
+          <Block row>
+            <Image source={{ uri: item.image }} style={styles.thumbnailHorizontal} />
+            <Block flex style={styles.content}>
+              <Text style={styles.title}>{item.title}</Text>
+              <Text>{item.cta}</Text>
+            </Block>
+          </Block>
+        ) : (
+          <Block>
+            <Image source={{ uri: item.image }} style={styles.thumbnailVertical} />
+            <Text style={styles.title}>{item.title}</Text>
+            <Text>{item.cta}</Text>
+          </Block>
+        )}
+      </Block>
+    </TouchableOpacity>
+  );
+
+  const renderArticlesCarousel = () => (
+    <View style={styles.carouselContainer}>
+      <Carousel
+        data={articles}
+        renderItem={renderCarouselItem}
+        sliderWidth={width - 40}  // Adjusted width
+        itemWidth={width - 80}   // Adjusted width
+        onSnapToItem={(index) => setActiveSlide(index)}
+      />
+      <Pagination
+        dotsLength={articles.length}
+        activeDotIndex={activeSlide}
+        containerStyle={{ marginTop: -15 }}
+        dotStyle={{
+          width: 10,
+          height: 10,
+          borderRadius: 5,
+          marginHorizontal: 8,
+          backgroundColor: theme.COLORS.MUTED,
+        }}
+        inactiveDotStyle={{
+          backgroundColor: theme.COLORS.MUTED,
+        }}
+        inactiveDotOpacity={0.4}
+        inactiveDotScale={0.6}
+      />
+    </View>
+  );
+
+  const renderArticlesList = () => (
     <ScrollView contentContainerStyle={styles.articles}>
       {selectedarticle ? (
         <TouchableOpacity onPress={goback}>
-          {/* Render selected article details */}
           <Block style={styles.articleCard}>
             <Image source={{ uri: selectedarticle.image }} style={styles.thumbnailVertical} />
             <Text style={styles.title}>{selectedarticle.title}</Text>
             <Text style={styles.description}>{selectedarticle.description}</Text>
-
-            {/* Additional styling for single article */}
             <Text style={styles.singleArticleContent}>{selectedarticle.content}</Text>
           </Block>
         </TouchableOpacity>
       ) : (
-        // Render list of articles
         articles.map((article, index) => (
           <TouchableOpacity key={index} onPress={() => openArticle(article)}>
             <Block key={index} style={styles.articleCard}>
@@ -115,47 +165,49 @@ const Home = () => {
     </ScrollView>
   );
 
-    return (
-      <Block flex style={styles.home}>
-        <Block flex={0.1} style={styles.searchBarContainer}>
-          <TouchableOpacity onPress={toggleDrawer}>
-            <Icon style={{ top: 25 }} name="menu" family="Feather" size={25} color={theme.COLORS.MUTED} />
-          </TouchableOpacity>
-        </Block>
-        <View style={{ flex: 1, flexDirection: 'row' }}>
-          <TouchableOpacity activeOpacity={1} onPress={closeDrawer} style={{ flex: 1 }}>
-            <Block flex>
-              {renderArticles()}
-            </Block>
-          </TouchableOpacity>
-          {isDrawerOpen && renderDrawer()}
-        </View>
+  const renderHeader = () => (
+    <Block style={styles.searchBarContainer}>
+      <TouchableOpacity onPress={toggleDrawer}>
+        <Icon style={{ top: 25, marginRight: 20 }} name="menu" family="Feather" size={25} color={theme.COLORS.MUTED} />
+      </TouchableOpacity>
+      <Text style={styles.companyName}>Your Company Name</Text>
+    </Block>
+  );
 
-        {/* Bottom Navigation Bar */}
-        <Block style={styles.bottomNavBar}>
-          <TouchableOpacity style={styles.bottomNavItem} onPress={() => openArticle(null)}>
-            <Icon name="home" family="Feather" size={20} color={theme.COLORS.MUTED} />
-            <Text style={styles.bottomNavText}>Home</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.bottomNavItem} onPress={switchinbox}>
-            <Icon name="inbox" family="Feather" size={20} color={theme.COLORS.MUTED} />
-            <Text style={styles.bottomNavText}>Inbox</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.bottomNavItem} onPress={profilescreen}>
-            <Icon name="user" family="Feather" size={20} color={theme.COLORS.MUTED} />
-            <Text style={styles.bottomNavText}>Profile</Text>
-          </TouchableOpacity>
+  return (
+    <Block flex style={styles.home}>
+      <View style={{ flex: 1, flexDirection: 'row' }}>
+        <TouchableOpacity activeOpacity={1} onPress={closeDrawer} style={{ flex: 1 }}>
+          <Block flex>
+            {renderHeader()}
+            {renderArticlesCarousel()}
+            {renderArticlesList()}
+          </Block>
+        </TouchableOpacity>
+        {isDrawerOpen && renderDrawer()}
+      </View>
 
-          <TouchableOpacity style={styles.bottomNavItem} onPress={hashtagscreen}>
-            <Icon name="hash" family="Feather" size={20} color={theme.COLORS.MUTED} />
-            <Text style={styles.bottomNavText}>Hashtags</Text>
-          </TouchableOpacity>
-        </Block>
+      <Block style={styles.bottomNavBar}>
+        <TouchableOpacity style={styles.bottomNavItem} onPress={() => openArticle(null)}>
+          <Icon name="home" family="Feather" size={20} color={theme.COLORS.MUTED} />
+          <Text style={styles.bottomNavText}>Home</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.bottomNavItem} onPress={switchinbox}>
+          <Icon name="inbox" family="Feather" size={20} color={theme.COLORS.MUTED} />
+          <Text style={styles.bottomNavText}>Inbox</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.bottomNavItem} onPress={profilescreen}>
+          <Icon name="user" family="Feather" size={20} color={theme.COLORS.MUTED} />
+          <Text style={styles.bottomNavText}>Profile</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.bottomNavItem} onPress={hashtagscreen}>
+          <Icon name="hash" family="Feather" size={20} color={theme.COLORS.MUTED} />
+          <Text style={styles.bottomNavText}>Hashtags</Text>
+        </TouchableOpacity>
       </Block>
-    );
-  
+    </Block>
+  );
 };
-
 
 const DrawerItem = ({ title, onPress, icon }) => (
   <TouchableOpacity style={styles.drawerItem} onPress={onPress}>
@@ -171,7 +223,7 @@ const styles = StyleSheet.create({
     flex: 1,
     width: width,
     height: height,
-    backgroundColor:'white',
+    backgroundColor: 'white',
   },
   articles: {
     paddingVertical: 1,
@@ -180,20 +232,16 @@ const styles = StyleSheet.create({
   searchBarContainer: {
     padding: 10,
     backgroundColor: 'white',
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: 'gray',
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: 20,
-    marginTop: 20,
+    paddingHorizontal: 10,
+    marginTop: -10,
   },
-  searchInput: {
-    borderRadius: theme.SIZES.BASE / 2,
-    borderColor: theme.COLORS.MUTED,
-    height: theme.SIZES.BASE * 2,
-    width: width - 100,
-    top: 25,
+  companyName: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: theme.COLORS.MUTED,
   },
   articleCard: {
     backgroundColor: 'white',
@@ -233,14 +281,14 @@ const styles = StyleSheet.create({
   description: {
     fontSize: 16,
     marginBottom: 10,
-    color: 'rgba(0, 0, 0, 0.8)', // Customize the color as needed
+    color: 'rgba(0, 0, 0, 0.8)',
   },
   singleArticleContent: {
     fontFamily: 'SourceSerifPro_400Regular',
     fontSize: 18,
     lineHeight: 28,
     marginTop: 10,
-    color: 'rgba(0, 0, 0, 0.9)', // Customize the color as needed
+    color: 'rgba(0, 0, 0, 0.9)',
   },
   drawer: {
     position: 'absolute',
@@ -269,7 +317,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: 'rgba(20,50,20,0.5)',
     fontWeight: 'bold',
-
     textShadowColor: 'rgba(0, 0, 0, 0.1)',
     textShadowOffset: { width: 1, height: 1 },
     textShadowRadius: 1,
@@ -309,6 +356,19 @@ const styles = StyleSheet.create({
   },
   bottomNavText: {
     marginTop: 5,
+    color: theme.COLORS.MUTED,
+  },
+  carouselContainer: {
+    marginTop: 20,
+    marginBottom: 10,
+  },
+  headerContainer: {
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  companyName: {
+    fontSize: 20,
+    fontWeight: 'bold',
     color: theme.COLORS.MUTED,
   },
 });
